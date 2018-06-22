@@ -10,10 +10,12 @@ testX = pd.read_pickle("testX.pkl")
 testIDs = pd.read_pickle("testID.pkl")
 
 trainX, trainXtest, trainY, trainYtest = train_test_split(trainX, trainY, test_size=0.2, random_state=7)
+
+# Random forest regressor does not support custom loss functions like the one being used to evaluate in kaggle
 model = RandomForestRegressor(n_jobs=-1)
 
 scores = []
-estimators = np.arange(10, 300, 10)
+estimators = np.arange(40, 500, 10)
 for n in estimators:
     model.set_params(n_estimators=n)
     model.fit(trainX, trainY)

@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, KernelPCA
 PCA_COMPONENT_AMOUNT = 200
 TRAINING_SET_FILE = "train_no_constant_scaled_PCA.pkl"
 
@@ -28,10 +28,18 @@ def apply_pca(df, features=200):  # Applies PCA on a dataframe and returns anoth
     pca_df = pd.DataFrame(pca_df, columns=[i for i in range(features)])
     return pca_df
 
+def apply_kernelpca(df, features=200):  # Applies PCA on a dataframe and returns another with labeled features
+    scaled_df = StandardScaler().fit_transform(df)
+    pca = KernelPCA(n_components=features, kernel="poly", random_state=7)
+    pca_df = pca.fit_transform(scaled_df)
+    pca_df = pd.DataFrame(pca_df, columns=[i for i in range(features)])
+    return pca_df
+
 
 for file in ["./raw_files/test.csv", "./raw_files/train.csv"]:
 
     dataframe = pd.read_csv(file)
+    # remove_constant_columns(dataframe)
     IDs = separate_id(dataframe)
 
     if "train" in file:
@@ -40,7 +48,7 @@ for file in ["./raw_files/test.csv", "./raw_files/train.csv"]:
     else:
         IDs.to_pickle("testID.pkl")
 
-    pca_dataframe = apply_pca(dataframe, PCA_COMPONENT_AMOUNT)
+    pca_dataframe = apply_kernelpca(dataframe, PCA_COMPONENT_AMOUNT)
     pca_dataframe.to_pickle("testX.pkl" if "test" in file else "trainX.pkl")
 
 """ 
